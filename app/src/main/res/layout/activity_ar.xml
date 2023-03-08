@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".betabyte.ArActivity">
+
+
+    <fragment
+        android:name="com.google.ar.sceneform.ux.ArFragment"
+        android:id="@+id/sceneform_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <RelativeLayout
+        android:id="@+id/layoutButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="50dp"
+        android:visibility="visible"
+        android:layout_gravity="center|bottom">
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/set"
+            android:textAllCaps="false"
+            android:layout_margin="20dp"
+            android:layout_gravity="center|bottom"
+            android:textColor="@android:color/black"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:layout_margin="20dp"
+            android:text="@string/reset"
+            android:layout_toEndOf="@+id/btnSet" />
+    </RelativeLayout>
+
+</FrameLayout>

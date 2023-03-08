@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Share Of Shelf</string>
+    <string name="tap_to_continue">Tap To Continue</string>
+
+    <string name="to_measurement_button">To Measurement</string>
+    <string-array name="arcore_measurement_buttons">
+        <item>@string/to_measurement_button</item>
+    </string-array>
+    <string name="distance_from_camera">Distance from camera</string>
+    <string name="distance_of_2_points">Distance of 2 points</string>
+    <string name="distance_of_multiple_points">Distance of multiple points</string>
+    <string name="distance_from_ground">Distance from ground</string>
+    <string name="clear">Clear</string>
+    <string name="initCM">0.0</string>
+    <string name="device_not_supported">Device not supported</string>
+    <string name="full_category_space">Full Category Space</string>
+    <string name="customer_category">Customer Category</string>
+    <string name="sos">SOS%</string>
+    <string name="save">Save</string>
+    <string name="unit">cm</string>
+    <string name="set">Set</string>
+    <string name="reset">Reset</string>
+    <string name="choose">Choose</string>
+    <string name="please_choose_any_of_the_option_for_selection">Please choose any of the option for selection!</string>
+    <string name="_2_points_selection">2 Points</string>
+    <string name="multi_points">Multi Points</string>
+    <string-array name="distance_mode">
+        <item>@string/distance_from_camera</item>
+        <item>@string/distance_of_2_points</item>
+        <item>@string/distance_of_multiple_points</item>
+        <item>@string/distance_from_ground</item>
+    </string-array>
+</resources>
