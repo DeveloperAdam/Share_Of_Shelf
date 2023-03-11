@@ -59,7 +59,7 @@ class ArActivity : AppCompatActivity(), Scene.OnUpdateListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ar)
-
+        supportActionBar?.hide()
         bindViews()
     }
 

@@ -57,7 +57,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-
+        supportActionBar?.hide()
         if (!checkIsSupportedDeviceOrFinish()) {
             Toast.makeText(
                 applicationContext,
@@ -172,7 +172,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/Screenshots"
         )
         val c = Calendar.getInstance()
-        val df = SimpleDateFormat("yyyy-MM-dd HH.mm.ss")
+        val df = SimpleDateFormat("yyyy-MM-dd HH.mm.ss", Locale.US)
         val formattedDate: String = df.format(c.time)
         val mediaFile = File(
             file,
