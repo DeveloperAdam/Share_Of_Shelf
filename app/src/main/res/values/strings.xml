@@ -24,6 +24,7 @@
     <string name="please_choose_any_of_the_option_for_selection">Please choose any of the option for selection!</string>
     <string name="_2_points_selection">2 Points</string>
     <string name="multi_points">Multi Points</string>
+    <string name="no_of_points">No Of Points</string>
     <string-array name="distance_mode">
         <item>@string/distance_from_camera</item>
         <item>@string/distance_of_2_points</item>

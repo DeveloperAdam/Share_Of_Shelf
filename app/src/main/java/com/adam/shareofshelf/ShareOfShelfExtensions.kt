@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream
 object ShareOfShelfExtensions {
 
     var mBitmapOBj : Bitmap? = null
+    var mBitmapOBj2 : Bitmap? = null
 
     fun View.takeScreenShot() : Bitmap{
         val bitmap = Bitmap.createBitmap(this.width, this.height, Bitmap.Config.ARGB_8888)

@@ -10,16 +10,16 @@ import android.graphics.Bitmap
 import android.os.*
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import com.adam.shareofshelf.ShareOfShelfExtensions.mBitmapOBj
+import com.adam.shareofshelf.ShareOfShelfExtensions.mBitmapOBj2
 import com.adam.shareofshelf.ShareOfShelfExtensions.takeScreenShot
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import java.io.*
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,11 +28,11 @@ const val TAG = "Device Support"
 const val INTENT_RECEIVE_DATA = 0
 const val PERMISSION_REQUEST_CODE = 1100
 const val INTENT_TYPE_SELECTION = "1000"
-
+const val INTENT_CAMERA_SELECTION = "1100"
 class DashboardActivity : AppCompatActivity(), View.OnClickListener {
 
     //Variables
-
+    private var is2PointsSelected = false
     private var permissionsGranted = false
     private var sosValue = 0.0
     private var fullCategorySpace = ""
@@ -90,6 +90,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
 
         btnSave.setOnClickListener(this)
         btnClear.setOnClickListener(this)
+        ivPreview1.setOnClickListener(this)
+        ivPreview2.setOnClickListener(this)
         ivFullCategoryCamera.setOnClickListener(this)
         ivCustomerCategoryCamera.setOnClickListener(this)
 
@@ -123,6 +125,16 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View?) {
 
         when (view?.id) {
+            R.id.ivPreview1 ->{
+                startActivity(Intent(this@DashboardActivity,ImagePreviewActivity::class.java).apply {
+                    putExtra(INTENT_TYPE_SELECTION, true)
+                })
+            }
+            R.id.ivPreview2 ->{
+                startActivity(Intent(this@DashboardActivity,ImagePreviewActivity::class.java).apply {
+                    putExtra(INTENT_TYPE_SELECTION, false)
+                })
+            }
             R.id.ivCameraFullCategory -> {
                 isFullCategorySelected = true
                 if (permissionsGranted)
@@ -152,14 +164,24 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
         val view = layoutInflater.inflate(R.layout.custom_dialog, null)
         val btn2Points = view.findViewById<Button>(R.id.btn2Points)
         val btnMultiPoints = view.findViewById<Button>(R.id.btnMultiplePoints)
+        val btnSet = view.findViewById<Button>(R.id.btnSet)
+        val etPointsCount = view.findViewById<EditText>(R.id.etPointsCount)
+        val layoutEditText = view.findViewById<ConstraintLayout>(R.id.layoutEditText)
 
         builder.setView(view)
         btn2Points.setOnClickListener {
-            gotoArScreen(is2PointsSelected = true)
+            is2PointsSelected = true
+            gotoArScreen()
             builder.dismiss()
         }
         btnMultiPoints.setOnClickListener {
-            gotoArScreen(is2PointsSelected = false)
+            layoutEditText.visibility = View.VISIBLE
+        }
+        btnSet.setOnClickListener {
+            val points = etPointsCount.text.toString()
+            Constants.maxNumMultiplePoints = points.toInt()
+            is2PointsSelected = false
+            gotoArScreen()
             builder.dismiss()
         }
         builder.setCanceledOnTouchOutside(false)
@@ -196,18 +218,21 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
         tvSOSValue.text = ""
         tvFullCategoryValue.text = ""
         tvCustomerCategoryValue.text = ""
-        ivFullCategoryCamera.setImageResource(0)
-        ivCustomerCategoryCamera.setImageResource(0)
+        ivPreview1.setImageResource(0)
+        ivPreview2.setImageResource(0)
         mBitmapOBj?.recycle()
+        mBitmapOBj2?.recycle()
 
-        ivFullCategoryCamera.setImageResource(R.drawable.ic_camera)
-        ivCustomerCategoryCamera.setImageResource(R.drawable.ic_camera)
+        ivPreview1.visibility = View.GONE
+        ivPreview2.visibility = View.GONE
+
     }
 
-    private fun gotoArScreen(is2PointsSelected: Boolean) {
+    private fun gotoArScreen() {
 
         startActivityForResult(Intent(this, ArActivity::class.java).apply {
             putExtra(INTENT_TYPE_SELECTION, is2PointsSelected)
+            putExtra(INTENT_CAMERA_SELECTION, isFullCategorySelected)
         }, INTENT_RECEIVE_DATA)
     }
 
@@ -281,9 +306,9 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
 
         if (fullCategorySpace.isNotEmpty() && customerCategorySpace.isNotEmpty()) {
             sosValue = fullCategorySpace.toDouble() * customerCategorySpace.toDouble()
-            tvSOSValue.text = sosValue.toString()
+            val value = DecimalFormat("##.##").format(sosValue)
+            tvSOSValue.text = value
         }
-
         if (isFullCategorySelected)
             ivFullCategoryCamera.setImageBitmap(mBitmapOBj)
         else
