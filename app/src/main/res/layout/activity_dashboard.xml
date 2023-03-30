@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:padding="15dp"
-    tools:context=".DashboardActivity">
+    tools:context=".ui.DashboardActivity">
 
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -189,10 +189,12 @@
             android:id="@+id/btnClear"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
             android:background="@drawable/rounded_button"
             android:text="@string/clear"
+            android:textSize="16sp"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@android:color/white"
             app:layout_constraintEnd_toStartOf="@+id/btnSave"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -205,7 +207,8 @@
             android:background="@drawable/rounded_button"
             android:text="@string/save"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btnClear"
             app:layout_constraintTop_toTopOf="parent" />

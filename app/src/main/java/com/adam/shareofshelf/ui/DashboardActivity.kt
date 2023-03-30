@@ -1,4 +1,4 @@
-package com.adam.shareofshelf
+package com.adam.shareofshelf.ui
 
 import android.Manifest
 import android.app.ActivityManager
@@ -14,9 +14,11 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-import com.adam.shareofshelf.ShareOfShelfExtensions.mBitmapOBj
-import com.adam.shareofshelf.ShareOfShelfExtensions.mBitmapOBj2
-import com.adam.shareofshelf.ShareOfShelfExtensions.takeScreenShot
+import com.adam.shareofshelf.utils.Constants
+import com.adam.shareofshelf.R
+import com.adam.shareofshelf.utils.ShareOfShelfExtensions.mBitmapOBj
+import com.adam.shareofshelf.utils.ShareOfShelfExtensions.mBitmapOBj2
+import com.adam.shareofshelf.utils.ShareOfShelfExtensions.takeScreenShot
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import java.io.*
 import java.text.DecimalFormat
@@ -29,6 +31,8 @@ const val INTENT_RECEIVE_DATA = 0
 const val PERMISSION_REQUEST_CODE = 1100
 const val INTENT_TYPE_SELECTION = "1000"
 const val INTENT_CAMERA_SELECTION = "1100"
+const val INTENT_MAX_DISTANCE = "1101"
+
 class DashboardActivity : AppCompatActivity(), View.OnClickListener {
 
     //Variables
@@ -37,7 +41,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
     private var sosValue = 0.0
     private var fullCategorySpace = ""
     private var customerCategorySpace = ""
-    private val MinOpenGlVersin = 3.0
+    private val minOpenGlVersion = 3.0
     private var isFullCategorySelected = false
 
     //Views
@@ -48,9 +52,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var ivFullCategoryCamera: ImageView
     private lateinit var ivCustomerCategoryCamera: ImageView
 
-    val PERMISSIONS_STORAGE = arrayOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    private val permissionStorage = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,11 +63,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
         supportActionBar?.hide()
         if (!checkIsSupportedDeviceOrFinish()) {
             Toast.makeText(
-                applicationContext,
-                getString(R.string.device_not_supported),
-                Toast.LENGTH_LONG
-            )
-                .show()
+                applicationContext, getString(R.string.device_not_supported), Toast.LENGTH_LONG
+            ).show()
         } else {
             bindViews()
         }
@@ -90,10 +90,10 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
 
         btnSave.setOnClickListener(this)
         btnClear.setOnClickListener(this)
-        ivPreview1.setOnClickListener(this)
-        ivPreview2.setOnClickListener(this)
         ivFullCategoryCamera.setOnClickListener(this)
         ivCustomerCategoryCamera.setOnClickListener(this)
+        ivPreview1.setOnClickListener(this)
+        ivPreview2.setOnClickListener(this)
 
         askUserForFilePermission()
 
@@ -101,53 +101,47 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
 
 
     private fun checkIsSupportedDeviceOrFinish(): Boolean {
-        val openGlVersionString =
-            (Objects.requireNonNull(
-                this
-                    .getSystemService(Context.ACTIVITY_SERVICE)
-            ) as ActivityManager)
-                .deviceConfigurationInfo
-                .glEsVersion
-        if (openGlVersionString.toDouble() < MinOpenGlVersin) {
-            Log.e(TAG, "Sceneform requires OpenGL ES ${MinOpenGlVersin} later")
+        val openGlVersionString = (Objects.requireNonNull(
+            this.getSystemService(Context.ACTIVITY_SERVICE)
+        ) as ActivityManager).deviceConfigurationInfo.glEsVersion
+        if (openGlVersionString.toDouble() < minOpenGlVersion) {
+            Log.e(TAG, "Scene form requires OpenGL ES $minOpenGlVersion later")
             Toast.makeText(
-                this,
-                "Sceneform requires OpenGL ES ${MinOpenGlVersin} or later",
-                Toast.LENGTH_LONG
-            )
-                .show()
+                this, "Scene form requires OpenGL ES $minOpenGlVersion or later", Toast.LENGTH_LONG
+            ).show()
             finish()
             return false
         }
         return true
     }
 
+
     override fun onClick(view: View?) {
 
         when (view?.id) {
-            R.id.ivPreview1 ->{
-                startActivity(Intent(this@DashboardActivity,ImagePreviewActivity::class.java).apply {
+            R.id.ivPreview1 -> {
+                startActivity(Intent(
+                    this@DashboardActivity, ImagePreviewActivity::class.java
+                ).apply {
                     putExtra(INTENT_TYPE_SELECTION, true)
                 })
             }
-            R.id.ivPreview2 ->{
-                startActivity(Intent(this@DashboardActivity,ImagePreviewActivity::class.java).apply {
+            R.id.ivPreview2 -> {
+                startActivity(Intent(
+                    this@DashboardActivity, ImagePreviewActivity::class.java
+                ).apply {
                     putExtra(INTENT_TYPE_SELECTION, false)
                 })
             }
             R.id.ivCameraFullCategory -> {
                 isFullCategorySelected = true
-                if (permissionsGranted)
-                    showDialog()
-                else
-                    checkExternalStoragePermission()
+                if (permissionsGranted) showDialog()
+                else checkExternalStoragePermission()
             }
             R.id.ivCameraCustomerCategory -> {
                 isFullCategorySelected = false
-                if (permissionsGranted)
-                    showDialog()
-                else
-                    checkExternalStoragePermission()
+                if (permissionsGranted) showDialog()
+                else checkExternalStoragePermission()
             }
             R.id.btnClear -> clearValues()
 
@@ -159,14 +153,14 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun showDialog() {
-        val builder = AlertDialog.Builder(this, R.style.CustomAlertDialog)
-            .create()
+        val builder = AlertDialog.Builder(this, R.style.CustomAlertDialog).create()
         val view = layoutInflater.inflate(R.layout.custom_dialog, null)
         val btn2Points = view.findViewById<Button>(R.id.btn2Points)
         val btnMultiPoints = view.findViewById<Button>(R.id.btnMultiplePoints)
         val btnSet = view.findViewById<Button>(R.id.btnSet)
         val etPointsCount = view.findViewById<EditText>(R.id.etPointsCount)
         val layoutEditText = view.findViewById<ConstraintLayout>(R.id.layoutEditText)
+
 
         builder.setView(view)
         btn2Points.setOnClickListener {
@@ -194,11 +188,10 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/Screenshots"
         )
         val c = Calendar.getInstance()
-        val df = SimpleDateFormat("yyyy-MM-dd HH.mm.ss", Locale.US)
+        val df = SimpleDateFormat("yyyy-MM-dd HH.mm.ss")
         val formattedDate: String = df.format(c.time)
         val mediaFile = File(
-            file,
-            "FieldVisualizer$formattedDate.jpeg"
+            file, "FieldVisualizer$formattedDate.jpeg"
         )
         tvURI.text = mediaFile.absolutePath
         if (file.mkdirs()) {
@@ -233,18 +226,20 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
         startActivityForResult(Intent(this, ArActivity::class.java).apply {
             putExtra(INTENT_TYPE_SELECTION, is2PointsSelected)
             putExtra(INTENT_CAMERA_SELECTION, isFullCategorySelected)
+            if (fullCategorySpace.isNotEmpty()) putExtra(
+                INTENT_MAX_DISTANCE,
+                fullCategorySpace.toDouble()
+            )
         }, INTENT_RECEIVE_DATA)
     }
 
     private fun requestExternalStoragePermission(): Boolean {
+
         return if (ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         ) {
-            val builder = AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle("Alert!")
+            val builder = AlertDialog.Builder(this).setCancelable(true).setTitle("Alert!")
                 .setMessage("External storage permission allows us to access data from storage. Please allow in App Settings for additional functionality.")
                 .setPositiveButton("OK") { dialog, which ->
                     dialog.dismiss()
@@ -253,9 +248,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
             false
         } else {
             ActivityCompat.requestPermissions(
-                this,
-                PERMISSIONS_STORAGE,
-                PERMISSION_REQUEST_CODE
+                this, permissionStorage, PERMISSION_REQUEST_CODE
             )
             true
         }
@@ -264,14 +257,12 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
     private fun askUserForFilePermission() {
         permissionsGranted = if (!checkExternalStoragePermission()) {
             requestExternalStoragePermission()
-        } else
-            true
+        } else true
     }
 
     private fun checkExternalStoragePermission(): Boolean {
         val result = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            this, Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
         return if (result == PackageManager.PERMISSION_GRANTED) {
             true
@@ -288,6 +279,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
                 data?.let {
                     it.getStringExtra(INTENT_RECEIVE_DATA.toString())?.let { value ->
                         if (isFullCategorySelected) {
+
                             fullCategorySpace = value
                         } else {
                             customerCategorySpace = value
@@ -305,14 +297,18 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
         tvCustomerCategoryValue.text = customerCategorySpace.plus(" ${getString(R.string.unit)}")
 
         if (fullCategorySpace.isNotEmpty() && customerCategorySpace.isNotEmpty()) {
-            sosValue = fullCategorySpace.toDouble() * customerCategorySpace.toDouble()
+            sosValue = customerCategorySpace.toDouble() / fullCategorySpace.toDouble() * 100
             val value = DecimalFormat("##.##").format(sosValue)
             tvSOSValue.text = value
         }
-        if (isFullCategorySelected)
-            ivFullCategoryCamera.setImageBitmap(mBitmapOBj)
-        else
-            ivCustomerCategoryCamera.setImageBitmap(mBitmapOBj)
+
+        if (isFullCategorySelected) {
+            ivPreview1.visibility = View.VISIBLE
+            ivPreview1.setImageBitmap(mBitmapOBj)
+        } else {
+            ivPreview2.visibility = View.VISIBLE
+            ivPreview2.setImageBitmap(mBitmapOBj2)
+        }
     }
 }
 

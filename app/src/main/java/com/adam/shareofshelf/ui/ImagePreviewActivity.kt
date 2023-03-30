@@ -1,9 +1,10 @@
-package com.adam.shareofshelf
+package com.adam.shareofshelf.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.adam.shareofshelf.ShareOfShelfExtensions.mBitmapOBj
-import com.adam.shareofshelf.ShareOfShelfExtensions.mBitmapOBj2
+import com.adam.shareofshelf.R
+import com.adam.shareofshelf.utils.ShareOfShelfExtensions.mBitmapOBj
+import com.adam.shareofshelf.utils.ShareOfShelfExtensions.mBitmapOBj2
 import kotlinx.android.synthetic.main.activity_image_preview.*
 
 class ImagePreviewActivity : AppCompatActivity() {

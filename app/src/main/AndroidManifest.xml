@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.adam.shareofshelf">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -17,12 +19,12 @@
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ShareOfShelf"
+        android:theme="@style/AppTheme"
         tools:targetApi="31"
         android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,9 +32,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DashboardActivity"
+        <activity android:name=".ui.DashboardActivity"
             android:exported="true"/>
-        <activity android:name=".ArActivity"
+        <activity android:name=".ui.ArActivity"
+            android:exported="true"/>
+        <activity android:name=".ui.ListOfClientsActivity"
+            android:exported="true"/>
+        <activity android:name=".ui.LoginActivity"
+            android:exported="true"/>
+        <activity android:name=".ui.ImagePreviewActivity"
             android:exported="true"/>
         <meta-data
             android:name="com.google.ar.core"

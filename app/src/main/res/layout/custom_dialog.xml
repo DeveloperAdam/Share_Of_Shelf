@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="20dp"
+    android:clipToPadding="true"
     android:elevation="4dp"
-    app:cardCornerRadius="12dp"
-    android:clipToPadding="true">
+    app:cardCornerRadius="12dp">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,25 +15,26 @@
         android:padding="15dp">
 
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvDialogTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/choose"
-        android:textColor="@android:color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDialogTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/choose"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tvDialogDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="@string/please_choose_any_of_the_option_for_selection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDialogTitle" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvDialogDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:textSize="14sp"
+            android:text="@string/please_choose_any_of_the_option_for_selection"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDialogTitle" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutEditText"
@@ -49,7 +49,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/no_of_points"
-                android:textColorHint="@color/grey"
+                android:textColorHint="#BDBDBD"
                 android:layout_marginEnd="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btnSet"
@@ -62,45 +62,51 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/set"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="@color/colorAccent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/etPointsCount"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDialogDescription">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn2Points"
-            android:layout_width="150dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutButtons"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/_2_points_selection"
-            android:textSize="18sp"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:background="@drawable/rounded_button"
-            app:layout_constraintEnd_toStartOf="@+id/btnMultiplePoints"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginTop="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layoutEditText">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnMultiplePoints"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:text="@string/multi_points"
-            android:textSize="18sp"
-            android:textAllCaps="false"
-            android:background="@drawable/rounded_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btn2Points"
-            app:layout_constraintTop_toTopOf="parent" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn2Points"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/_2_points_selection"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                app:layout_constraintEnd_toStartOf="@+id/btnMultiplePoints"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnMultiplePoints"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/multi_points"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                android:textAllCaps="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btn2Points"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

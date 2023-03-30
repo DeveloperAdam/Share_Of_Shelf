@@ -1,4 +1,4 @@
-package com.adam.shareofshelf
+package com.adam.shareofshelf.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

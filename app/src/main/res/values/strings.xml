@@ -31,4 +31,15 @@
         <item>@string/distance_of_multiple_points</item>
         <item>@string/distance_from_ground</item>
     </string-array>
+
+    <string name="user_id_username">User ID / Username</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="validate_username">Enter Username</string>
+    <string name="validate_password">Enter Password</string>
+    <string name="confirm_logout">Are you sure you want to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="limit_exceeded">Limit exceeded</string>
 </resources>
