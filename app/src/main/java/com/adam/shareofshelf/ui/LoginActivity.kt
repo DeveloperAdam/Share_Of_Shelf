@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.adam.shareofshelf.R
 import com.adam.shareofshelf.retrofit.DaeemServiceInterface
 import com.adam.shareofshelf.retrofit.RetrofitClient
+import com.adam.shareofshelf.utils.Constants.INTENT_ID
 import com.adam.shareofshelf.utils.Constants.PREFS_NAME
 import com.adam.shareofshelf.utils.Constants.PREF_UNAME
 import kotlinx.android.synthetic.main.activity_login.*
@@ -23,26 +24,30 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
+    private var id = ""
     private var strUsername = ""
     private var strPassword = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
         supportActionBar?.hide()
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
-        layoutButton.setOnClickListener {
-                 if(validate())
-                     authenticateUser()
-        }
+
+        icon.setOnClickListener(this)
+        tvSignIn.setOnClickListener(this)
+        layoutButton.setOnClickListener(this)
     }
 
     private fun gotoDashboard() {
         if (cbRememberMe.isChecked)
             savePreferences()
-        startActivity(Intent(this@LoginActivity, ListOfClientsActivity::class.java))
+        startActivity(Intent(this@LoginActivity, ListOfClientsActivity::class.java).apply {
+            putExtra(INTENT_ID, id)
+        })
         finish()
     }
 
@@ -52,22 +57,29 @@ class LoginActivity : AppCompatActivity() {
         val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                apiInterface.authenticateUser(strUsername,strPassword).enqueue(
+                apiInterface.authenticateUser(strUsername, strPassword).enqueue(
                     object : Callback<String> {
                         override fun onResponse(
                             call: Call<String>,
                             response: Response<String>
                         ) {
                             progress.visibility = View.GONE
-                            if(response.body().equals("not found",true))
-                            Toast.makeText(this@LoginActivity,"Authentication Failed",Toast.LENGTH_LONG).show()
-                            else
+                            if (response.body().equals("not found", true))
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "Authentication Failed",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            else {
+                                id = response.body().toString()
                                 gotoDashboard()
+                            }
                         }
 
                         override fun onFailure(call: Call<String>, t: Throwable) {
                             progress.visibility = View.GONE
-                            Toast.makeText(this@LoginActivity,t.toString(),Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@LoginActivity, t.toString(), Toast.LENGTH_LONG)
+                                .show()
                         }
 
                     }
@@ -76,7 +88,7 @@ class LoginActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     progress.visibility = View.GONE
                 }
-                Log.e("Error", Ex.localizedMessage)
+                Ex.localizedMessage?.let { Log.e("Error", it) }
             }
         }
     }
@@ -118,14 +130,22 @@ class LoginActivity : AppCompatActivity() {
         )
         // Get value
         strUsername = settings.getString(PREF_UNAME, "Username") ?: "Username"
-        if (!strUsername.equals("username",true))
-        etUsername.setText(strUsername)
-
+        if (!strUsername.equals("username", true))
+            etUsername.setText(strUsername)
+        else
+            return
     }
 
 
     override fun onResume() {
         super.onResume()
         loadPreferences()
+    }
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.layoutButton, R.id.icon, R.id.tvSignIn -> if (validate())
+                authenticateUser()
+        }
     }
 }

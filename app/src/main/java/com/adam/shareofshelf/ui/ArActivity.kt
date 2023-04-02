@@ -445,6 +445,9 @@ class ArActivity : AppCompatActivity(), Scene.OnUpdateListener {
                         .findViewById<TextView>(R.id.distanceCard)
                     if (textView.text.isEmpty())
                     textView.text = distanceCMFloor
+                    else {
+                        return
+                    }
                 }
             }
         }

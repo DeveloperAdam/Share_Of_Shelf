@@ -58,6 +58,7 @@
             android:layout_centerInParent="true"
             android:src="@drawable/signin_icon" />
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/tvSignIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sign_in"
