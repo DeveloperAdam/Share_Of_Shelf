@@ -443,6 +443,7 @@ class ArActivity : AppCompatActivity(), Scene.OnUpdateListener {
                     val distanceCMFloor = "%.2f".format(distanceCM)
                     val textView = (textBetweenPointsViewList[j - 1].view as LinearLayout)
                         .findViewById<TextView>(R.id.distanceCard)
+                    if (textView.text.isEmpty())
                     textView.text = distanceCMFloor
                 }
             }
