@@ -16,7 +16,6 @@ import com.adam.shareofshelf.retrofit.RetrofitClient
 import com.adam.shareofshelf.ui.adapter.CustomerAdapter
 import com.adam.shareofshelf.ui.data.CustomerDataModel
 import com.adam.shareofshelf.utils.Constants.INTENT_ID
-import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,24 +31,6 @@ class HomeFragment : Fragment() {
     private lateinit var progress: ProgressBar
     private var customerDataModel: ArrayList<CustomerDataModel> = arrayListOf()
 
-    companion object {
-        fun newInstance(id: String): HomeFragment {
-            val fragment = HomeFragment()
-            val args = Bundle().apply {
-                putString(INTENT_ID, id)
-            }
-            fragment.arguments = args
-            return fragment
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.apply {
-         id = arguments?.getString(INTENT_ID) ?: ""
-        }
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,6 +38,10 @@ class HomeFragment : Fragment() {
 
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+        arguments?.let {
+            id = it.get(INTENT_ID) as String
+            Toast.makeText(requireContext(), id, Toast.LENGTH_LONG).show()
+        }
 
         progress = view.findViewById(R.id.progress)
         recyclerView = view.findViewById(R.id.rvCustomerList)
