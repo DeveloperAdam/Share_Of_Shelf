@@ -1,5 +1,6 @@
 package com.adam.shareofshelf.retrofit
 
+import com.adam.shareofshelf.ui.data.BranchDataModel
 import com.adam.shareofshelf.ui.data.CustomerDataModel
 import retrofit2.Call
 import retrofit2.http.*
@@ -18,5 +19,12 @@ interface DaeemServiceInterface {
         @Field("id") id : String,
         @Field("branch_id") branch_id : String
     ): Call<ArrayList<CustomerDataModel>>
+
+    @FormUrlEncoded
+    @POST("app/msl.php")
+    fun fetchListOfBranches(
+        @Field("customer_id") customerID : String,
+        @Field("branch_id") branchID : String
+    ): Call<ArrayList<BranchDataModel>>
 
 }

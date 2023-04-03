@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private fun gotoDashboard() {
         if (cbRememberMe.isChecked)
             savePreferences()
-        startActivity(Intent(this@LoginActivity, ListOfClientsActivity::class.java).apply {
+        startActivity(Intent(this@LoginActivity, HostActivity::class.java).apply {
             putExtra(INTENT_ID, id)
         })
         finish()
@@ -131,9 +131,15 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         // Get value
         strUsername = settings.getString(PREF_UNAME, "Username") ?: "Username"
         if (!strUsername.equals("username", true))
+        {
             etUsername.setText(strUsername)
+            cbRememberMe.isChecked = true
+        }
         else
+        {
+            cbRememberMe.isChecked = false
             return
+        }
     }
 
 

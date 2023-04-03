@@ -3,7 +3,6 @@ package com.adam.shareofshelf.ui
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.adam.shareofshelf.R
@@ -11,9 +10,9 @@ import com.adam.shareofshelf.utils.Constants.INTENT_ID
 import kotlinx.android.synthetic.main.activity_list_of_clients.*
 
 
-class ListOfClientsActivity : AppCompatActivity() {
+class HostActivity : AppCompatActivity() {
 
-    private var id = ""
+    var id = ""
     private var navController: NavController? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +54,6 @@ class ListOfClientsActivity : AppCompatActivity() {
     }
 
     private fun gotoHome() {
-        val bundle = Bundle().apply {
-           putString(INTENT_ID, id)
-        }
-        navController?.navigate(R.id.home_fragment, bundle)
+        supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment,HomeFragment()).commit()
     }
 }

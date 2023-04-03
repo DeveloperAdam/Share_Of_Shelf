@@ -36,7 +36,7 @@
             android:exported="true"/>
         <activity android:name=".ui.ArActivity"
             android:exported="true"/>
-        <activity android:name=".ui.ListOfClientsActivity"
+        <activity android:name=".ui.HostActivity"
             android:exported="true"/>
         <activity android:name=".ui.LoginActivity"
             android:exported="true"/>

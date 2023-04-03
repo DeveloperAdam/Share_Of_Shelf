@@ -4,6 +4,7 @@ object Constants{
 
     //INTENT
     const val INTENT_ID = "id"
+    const val INTENT_CUSTOMER = "customer"
 
     //Variables
     var maxNumMultiplePoints = 4

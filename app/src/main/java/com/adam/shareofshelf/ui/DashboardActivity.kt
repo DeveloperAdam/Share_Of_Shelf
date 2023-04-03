@@ -14,16 +14,32 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.adam.shareofshelf.utils.Constants
 import com.adam.shareofshelf.R
+import com.adam.shareofshelf.retrofit.DaeemServiceInterface
+import com.adam.shareofshelf.retrofit.RetrofitClient
+import com.adam.shareofshelf.ui.adapter.BranchAdapter
+import com.adam.shareofshelf.ui.adapter.OnBranchClickListener
+import com.adam.shareofshelf.ui.data.BranchDataModel
+import com.adam.shareofshelf.ui.data.CustomerDataModel
+import com.adam.shareofshelf.utils.Constants.INTENT_CUSTOMER
 import com.adam.shareofshelf.utils.ShareOfShelfExtensions.mBitmapOBj
 import com.adam.shareofshelf.utils.ShareOfShelfExtensions.mBitmapOBj2
 import com.adam.shareofshelf.utils.ShareOfShelfExtensions.takeScreenShot
 import kotlinx.android.synthetic.main.activity_dashboard.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.*
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 const val TAG = "Device Support"
@@ -33,7 +49,7 @@ const val INTENT_TYPE_SELECTION = "1000"
 const val INTENT_CAMERA_SELECTION = "1100"
 const val INTENT_MAX_DISTANCE = "1101"
 
-class DashboardActivity : AppCompatActivity(), View.OnClickListener {
+class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchClickListener {
 
     //Variables
     private var is2PointsSelected = false
@@ -52,6 +68,10 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var ivFullCategoryCamera: ImageView
     private lateinit var ivCustomerCategoryCamera: ImageView
 
+    //Data
+    private var customerDataModel: CustomerDataModel? = null
+    private var branchList: ArrayList<BranchDataModel> = arrayListOf()
+
     private val permissionStorage = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
@@ -60,12 +80,13 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        supportActionBar?.hide()
+
         if (!checkIsSupportedDeviceOrFinish()) {
             Toast.makeText(
                 applicationContext, getString(R.string.device_not_supported), Toast.LENGTH_LONG
             ).show()
         } else {
+            customerDataModel = intent?.getParcelableExtra(INTENT_CUSTOMER)
             bindViews()
         }
 
@@ -96,7 +117,61 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
         ivPreview2.setOnClickListener(this)
 
         askUserForFilePermission()
+        fetchBranches()
+    }
 
+    private fun fetchBranches() {
+        customerDataModel?.let {
+            val retrofit = RetrofitClient.getInstance()
+            val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    apiInterface.fetchListOfBranches(
+                        customerID = it.customerId ?: "",
+                        branchID = it.branchId ?: ""
+                    ).enqueue(
+                        object : Callback<ArrayList<BranchDataModel>> {
+                            override fun onResponse(
+                                call: Call<ArrayList<BranchDataModel>>,
+                                response: Response<ArrayList<BranchDataModel>>
+                            ) {
+                                progress.visibility = View.GONE
+                                layoutViews.visibility = View.VISIBLE
+                                response.body()?.let {
+                                    branchList = it
+                                    setAdapter()
+                                }
+                            }
+
+                            override fun onFailure(
+                                call: Call<ArrayList<BranchDataModel>>,
+                                t: Throwable
+                            ) {
+                                progress.visibility = View.GONE
+                                layoutViews.visibility = View.VISIBLE
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    t.toString(),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    )
+                } catch (Ex: Exception) {
+                    withContext(Dispatchers.Main) {
+                        progress.visibility = View.GONE
+                        layoutViews.visibility = View.VISIBLE
+                    }
+                    Ex.localizedMessage?.let { Log.e("Error", it) }
+                }
+            }
+        }
+    }
+
+    private fun setAdapter() {
+        rvBranchList.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        rvBranchList.adapter = BranchAdapter(branchList, this)
     }
 
 
@@ -309,6 +384,10 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener {
             ivPreview2.visibility = View.VISIBLE
             ivPreview2.setImageBitmap(mBitmapOBj2)
         }
+    }
+
+    override fun onBranchClick(model: BranchDataModel) {
+
     }
 }
 

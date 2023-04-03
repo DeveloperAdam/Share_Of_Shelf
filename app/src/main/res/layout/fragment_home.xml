@@ -3,17 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="15dp"
+    android:padding="10dp"
     android:background="@android:color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCustomerList"
+        android:id="@+id/rvBranchList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem=""
+        tools:listitem="@layout/customer_item"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
 
@@ -21,6 +21,5 @@
         android:id="@+id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
+        android:layout_gravity="center"/>
 </FrameLayout>
