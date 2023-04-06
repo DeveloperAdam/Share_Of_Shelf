@@ -5,7 +5,7 @@
     android:id="@+id/layoutParent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_background"
+    android:background="@android:color/white"
     android:padding="15dp"
     tools:context=".ui.DashboardActivity">
 
@@ -20,14 +20,20 @@
             android:layout_height="match_parent"
             android:visibility="invisible">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvBranchList"
+
+            <FrameLayout
+                android:id="@+id/layoutSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/branch_item" />
+                android:background="@drawable/edittext_border"
+                app:layout_constraintTop_toTopOf="parent">
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:layout_constraintTop_toTopOf="parent"/>
+            </FrameLayout>
+
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvFullCategory"
@@ -40,7 +46,7 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rvBranchList" />
+                app:layout_constraintTop_toBottomOf="@+id/layoutSpinner" />
 
 
             <LinearLayout

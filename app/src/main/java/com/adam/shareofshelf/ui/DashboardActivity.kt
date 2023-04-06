@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.adam.shareofshelf.utils.Constants
 import com.adam.shareofshelf.R
 import com.adam.shareofshelf.retrofit.DaeemServiceInterface
 import com.adam.shareofshelf.retrofit.RetrofitClient
@@ -23,6 +22,7 @@ import com.adam.shareofshelf.ui.adapter.BranchAdapter
 import com.adam.shareofshelf.ui.adapter.OnBranchClickListener
 import com.adam.shareofshelf.ui.data.BranchDataModel
 import com.adam.shareofshelf.ui.data.CustomerDataModel
+import com.adam.shareofshelf.utils.Constants
 import com.adam.shareofshelf.utils.Constants.INTENT_CUSTOMER
 import com.adam.shareofshelf.utils.ShareOfShelfExtensions.mBitmapOBj
 import com.adam.shareofshelf.utils.ShareOfShelfExtensions.mBitmapOBj2
@@ -169,9 +169,19 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     }
 
     private fun setAdapter() {
-        rvBranchList.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        rvBranchList.adapter = BranchAdapter(branchList, this)
+
+        val mList : ArrayList<Any?> = arrayListOf()
+        branchList.forEach{
+            mList.add(it.productName ?: "")
+        }
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            mList
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
     }
 
 
