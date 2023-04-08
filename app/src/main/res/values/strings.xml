@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Share Of Shelf</string>
+    <string name="app_name">Daeem</string>
     <string name="tap_to_continue">Tap To Continue</string>
 
     <string name="to_measurement_button">To Measurement</string>
@@ -42,4 +42,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="limit_exceeded">Limit exceeded</string>
+    <string name="image_uri">Image URI</string>
+    <string name="success_msg">Your Data has been submitted successfully.</string>
+    <string name="ok">OK</string>
 </resources>

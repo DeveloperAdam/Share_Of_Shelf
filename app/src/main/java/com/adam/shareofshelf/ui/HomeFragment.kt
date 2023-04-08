@@ -52,7 +52,7 @@ class HomeFragment : Fragment(), OnItemClickListener {
         val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                apiInterface.fetchListOfCustomers((activity as HostActivity).id, "branch").enqueue(
+                apiInterface.fetchListOfCustomers((activity as HostActivity).id).enqueue(
                     object : Callback<ArrayList<CustomerDataModel>> {
                         override fun onResponse(
                             call: Call<ArrayList<CustomerDataModel>>,

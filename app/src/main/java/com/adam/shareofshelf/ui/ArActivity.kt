@@ -39,6 +39,7 @@ import kotlin.math.sqrt
 
 class ArActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
+    private var lastPlacedAnchorNodesSize = -1
     private var maxDistance = 0.0
     private var sumOfMultiPoints = 0f
     private var distanceTextCM = ""
@@ -423,11 +424,19 @@ class ArActivity : AppCompatActivity(), Scene.OnUpdateListener {
     }
     override fun onUpdate(p0: FrameTime?) {
 
-        if (is2pointTypeSelected && distanceTextCM.isEmpty())
-            measureDistanceOf2Points()
-        else {
-            if (distanceTextCM.isEmpty())
-                measureMultipleDistances()
+        when(is2pointTypeSelected)
+        {
+            true ->{
+                if ( distanceTextCM.isEmpty())
+                    measureDistanceOf2Points()
+            }
+            false ->{
+                if(textBetweenPointsViewList.size > lastPlacedAnchorNodesSize)
+                {
+                    lastPlacedAnchorNodesSize = textBetweenPointsViewList.size
+                    measureMultipleDistances()
+                }
+            }
         }
     }
 
@@ -443,11 +452,7 @@ class ArActivity : AppCompatActivity(), Scene.OnUpdateListener {
                     val distanceCMFloor = "%.2f".format(distanceCM)
                     val textView = (textBetweenPointsViewList[j - 1].view as LinearLayout)
                         .findViewById<TextView>(R.id.distanceCard)
-                    if (textView.text.isEmpty())
                     textView.text = distanceCMFloor
-                    else {
-                        return
-                    }
                 }
             }
         }

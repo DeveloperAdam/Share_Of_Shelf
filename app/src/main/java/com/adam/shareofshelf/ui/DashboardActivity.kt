@@ -14,11 +14,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.adam.shareofshelf.R
 import com.adam.shareofshelf.retrofit.DaeemServiceInterface
 import com.adam.shareofshelf.retrofit.RetrofitClient
-import com.adam.shareofshelf.ui.adapter.BranchAdapter
 import com.adam.shareofshelf.ui.adapter.OnBranchClickListener
 import com.adam.shareofshelf.ui.data.BranchDataModel
 import com.adam.shareofshelf.ui.data.CustomerDataModel
@@ -36,10 +34,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.*
+import android.util.Base64
+import androidx.core.view.isVisible
+import com.adam.shareofshelf.ui.adapter.OnItemClickListener
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 const val TAG = "Device Support"
@@ -49,9 +49,13 @@ const val INTENT_TYPE_SELECTION = "1000"
 const val INTENT_CAMERA_SELECTION = "1100"
 const val INTENT_MAX_DISTANCE = "1101"
 
-class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchClickListener {
+class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchClickListener,
+    AdapterView.OnItemSelectedListener {
 
     //Variables
+    private var base64Image1 = ""
+    private var base64Image2 = ""
+    private var finalImageBase64 = ""
     private var is2PointsSelected = false
     private var permissionsGranted = false
     private var sosValue = 0.0
@@ -69,6 +73,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     private lateinit var ivCustomerCategoryCamera: ImageView
 
     //Data
+    private var branchDataModel : BranchDataModel? = null
     private var customerDataModel: CustomerDataModel? = null
     private var branchList: ArrayList<BranchDataModel> = arrayListOf()
 
@@ -168,6 +173,65 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         }
     }
 
+    private fun saveData(){
+        progress.visibility = View.VISIBLE
+        customerDataModel?.let {
+            val retrofit = RetrofitClient.getInstance()
+            val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    apiInterface.saveSOS(
+                        customerID = it.customerId ?: "",
+                        branchID = it.branchId ?: "",
+                        imageBase64 = tvURI.text.toString(),
+                        brandId = branchDataModel?.brandId ?: ""
+                    ).enqueue(
+                        object : Callback<String> {
+                            override fun onResponse(
+                                call: Call<String>,
+                                response: Response<String>
+                            ) {
+                                progress.visibility = View.GONE
+                                showSuccessDialog()
+
+                            }
+
+                            override fun onFailure(
+                                call: Call<String>,
+                                t: Throwable
+                            ) {
+                                progress.visibility = View.GONE
+                                layoutViews.visibility = View.VISIBLE
+                                Toast.makeText(
+                                    this@DashboardActivity,
+                                    t.toString(),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    )
+                } catch (Ex: Exception) {
+                    withContext(Dispatchers.Main) {
+                        progress.visibility = View.GONE
+                        layoutViews.visibility = View.VISIBLE
+                    }
+                    Ex.localizedMessage?.let { Log.e("Error", it) }
+                }
+            }
+        }
+    }
+
+    private fun showSuccessDialog() {
+        val builder = AlertDialog.Builder(this@DashboardActivity)
+        builder.setTitle(getString(R.string.app_name))
+        builder.setMessage(getString(R.string.success_msg))
+        builder.setPositiveButton(getString(R.string.ok)) { dialog, which ->
+           dialog.dismiss()
+        }
+        val dialog = builder.create()
+        dialog.show()
+    }
+
     private fun setAdapter() {
 
         val mList : ArrayList<Any?> = arrayListOf()
@@ -175,6 +239,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
             mList.add(it.productName ?: "")
         }
 
+        branchDataModel = branchList[0]
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
@@ -182,6 +247,9 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
+
+        // Set the item click listener on the spinner
+        spinner.onItemSelectedListener = this
     }
 
 
@@ -278,6 +346,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         val mediaFile = File(
             file, "FieldVisualizer$formattedDate.jpeg"
         )
+        uriHeader.text = getString(R.string.image_uri)
         tvURI.text = mediaFile.absolutePath
         if (file.mkdirs()) {
             val fileOutputStream = FileOutputStream(mediaFile)
@@ -286,6 +355,14 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
             fileOutputStream.close()
         }
 
+       saveData()
+    }
+
+    fun bitmapToBase64(bitmap: Bitmap): String {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray,Base64.DEFAULT)
     }
 
     private fun clearValues() {
@@ -397,6 +474,18 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     }
 
     override fun onBranchClick(model: BranchDataModel) {
+
+    }
+
+    override fun onItemSelected(view: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+        val item = view?.getItemAtPosition(position)
+        item?.let {
+            branchDataModel = branchList[position]
+        }
+    }
+
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
 
     }
 }

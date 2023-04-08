@@ -16,8 +16,7 @@ interface DaeemServiceInterface {
     @FormUrlEncoded
     @POST("app/pos.php")
     fun fetchListOfCustomers(
-        @Field("id") id : String,
-        @Field("branch_id") branch_id : String
+        @Field("id") id : String
     ): Call<ArrayList<CustomerDataModel>>
 
     @FormUrlEncoded
@@ -26,5 +25,14 @@ interface DaeemServiceInterface {
         @Field("customer_id") customerID : String,
         @Field("branch_id") branchID : String
     ): Call<ArrayList<BranchDataModel>>
+
+    @FormUrlEncoded
+    @POST("app/sos.php")
+    fun saveSOS(
+        @Field("customer_id") customerID : String,
+        @Field("branch_id") branchID : String,
+        @Field("image") imageBase64 : String,
+        @Field("brand_id") brandId : String
+    ): Call<String>
 
 }
