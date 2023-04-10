@@ -37,6 +37,8 @@ import java.io.*
 import android.util.Base64
 import androidx.core.view.isVisible
 import com.adam.shareofshelf.ui.adapter.OnItemClickListener
+import com.adam.shareofshelf.ui.data.ImageData
+import com.adam.shareofshelf.ui.data.SubmitDataRequest
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -73,7 +75,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     private lateinit var ivCustomerCategoryCamera: ImageView
 
     //Data
-    private var branchDataModel : BranchDataModel? = null
+    private var branchDataModel: BranchDataModel? = null
     private var customerDataModel: CustomerDataModel? = null
     private var branchList: ArrayList<BranchDataModel> = arrayListOf()
 
@@ -173,23 +175,27 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         }
     }
 
-    private fun saveData(){
+    private fun saveData() {
         progress.visibility = View.VISIBLE
         customerDataModel?.let {
+            val dataRequest = SubmitDataRequest(
+                fullImage = tvURI.text.toString(),
+                brandImage = tvURI.text.toString(),
+                totalSos = tvSOSValue.text.toString(),
+                brandSos = tvSOSValue.text.toString(),
+                brandId = branchDataModel?.brandId ?: "",
+                customerId = it.customerId ?: "",
+                branchId = it.branchId ?: ""
+            )
             val retrofit = RetrofitClient.getInstance()
             val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    apiInterface.saveSOS(
-                        customerID = it.customerId ?: "",
-                        branchID = it.branchId ?: "",
-                        imageBase64 = tvURI.text.toString(),
-                        brandId = branchDataModel?.brandId ?: ""
-                    ).enqueue(
-                        object : Callback<String> {
+                    apiInterface.saveSOS(dataRequest).enqueue(
+                        object : Callback<ImageData> {
                             override fun onResponse(
-                                call: Call<String>,
-                                response: Response<String>
+                                call: Call<ImageData>,
+                                response: Response<ImageData>
                             ) {
                                 progress.visibility = View.GONE
                                 showSuccessDialog()
@@ -197,7 +203,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                             }
 
                             override fun onFailure(
-                                call: Call<String>,
+                                call: Call<ImageData>,
                                 t: Throwable
                             ) {
                                 progress.visibility = View.GONE
@@ -226,7 +232,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         builder.setTitle(getString(R.string.app_name))
         builder.setMessage(getString(R.string.success_msg))
         builder.setPositiveButton(getString(R.string.ok)) { dialog, which ->
-           dialog.dismiss()
+            dialog.dismiss()
         }
         val dialog = builder.create()
         dialog.show()
@@ -234,8 +240,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
     private fun setAdapter() {
 
-        val mList : ArrayList<Any?> = arrayListOf()
-        branchList.forEach{
+        val mList: ArrayList<Any?> = arrayListOf()
+        branchList.forEach {
             mList.add(it.productName ?: "")
         }
 
@@ -355,14 +361,14 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
             fileOutputStream.close()
         }
 
-       saveData()
+        saveData()
     }
 
     fun bitmapToBase64(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
-        return Base64.encodeToString(byteArray,Base64.DEFAULT)
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
     private fun clearValues() {

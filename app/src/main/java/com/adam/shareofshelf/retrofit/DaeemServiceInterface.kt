@@ -2,6 +2,8 @@ package com.adam.shareofshelf.retrofit
 
 import com.adam.shareofshelf.ui.data.BranchDataModel
 import com.adam.shareofshelf.ui.data.CustomerDataModel
+import com.adam.shareofshelf.ui.data.ImageData
+import com.adam.shareofshelf.ui.data.SubmitDataRequest
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -26,13 +28,10 @@ interface DaeemServiceInterface {
         @Field("branch_id") branchID : String
     ): Call<ArrayList<BranchDataModel>>
 
-    @FormUrlEncoded
+
     @POST("app/sos.php")
     fun saveSOS(
-        @Field("customer_id") customerID : String,
-        @Field("branch_id") branchID : String,
-        @Field("image") imageBase64 : String,
-        @Field("brand_id") brandId : String
-    ): Call<String>
+        @Body dataModel: SubmitDataRequest
+    ): Call<ImageData>
 
 }
