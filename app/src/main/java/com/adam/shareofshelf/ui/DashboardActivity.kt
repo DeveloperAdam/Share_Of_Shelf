@@ -39,6 +39,7 @@ import androidx.core.view.isVisible
 import com.adam.shareofshelf.ui.adapter.OnItemClickListener
 import com.adam.shareofshelf.ui.data.ImageData
 import com.adam.shareofshelf.ui.data.SubmitDataRequest
+import okhttp3.ResponseBody
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -56,7 +57,6 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
     //Variables
     private var base64Image1 = ""
-    private var base64Image2 = ""
     private var finalImageBase64 = ""
     private var is2PointsSelected = false
     private var permissionsGranted = false
@@ -75,6 +75,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     private lateinit var ivCustomerCategoryCamera: ImageView
 
     //Data
+    private var submitDataResponse: ImageData? = null
     private var branchDataModel: BranchDataModel? = null
     private var customerDataModel: CustomerDataModel? = null
     private var branchList: ArrayList<BranchDataModel> = arrayListOf()
@@ -179,10 +180,10 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         progress.visibility = View.VISIBLE
         customerDataModel?.let {
             val dataRequest = SubmitDataRequest(
-                fullImage = tvURI.text.toString(),
-                brandImage = tvURI.text.toString(),
+                fullImage = finalImageBase64,
+                brandImage = base64Image1,
                 totalSos = tvSOSValue.text.toString(),
-                brandSos = tvSOSValue.text.toString(),
+                brandSos = tvCustomerCategoryValue.text.toString().split(" ")[0],
                 brandId = branchDataModel?.brandId ?: "",
                 customerId = it.customerId ?: "",
                 branchId = it.branchId ?: ""
@@ -198,10 +199,10 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                                 response: Response<ImageData>
                             ) {
                                 progress.visibility = View.GONE
-                                showSuccessDialog()
-
+                                if (response.isSuccessful) {
+                                    showSuccessDialog()
+                                }
                             }
-
                             override fun onFailure(
                                 call: Call<ImageData>,
                                 t: Throwable
@@ -236,6 +237,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         }
         val dialog = builder.create()
         dialog.show()
+
+        clearValues()
     }
 
     private fun setAdapter() {
@@ -305,9 +308,46 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
             R.id.btnClear -> clearValues()
 
             R.id.btnSave -> {
-                saveBitmapToDisk(layoutParent.takeScreenShot())
+
+                if(validate())
+                {
+                    mBitmapOBj2?.let {
+                        base64Image1 = saveBitmapToDisk(it)
+                    }
+                    finalImageBase64 = saveBitmapToDisk(layoutParent.takeScreenShot())
+                    uriHeader.text = getString(R.string.image_uri)
+                    tvURI.text = finalImageBase64
+                    saveData()
+                }
+                else
+                {
+                    val builder = AlertDialog.Builder(this).setCancelable(true).setTitle("Alert!")
+                        .setMessage("Kindly select all required fields")
+                        .setPositiveButton("OK") { dialog, which ->
+                            dialog.dismiss()
+                        }
+                    builder.show()
+                }
             }
         }
+
+    }
+
+    private fun validate(): Boolean {
+        var status = true
+
+        if (base64Image1.isEmpty())
+            status = false
+        if (finalImageBase64.isEmpty())
+            status = false
+        if (tvSOSValue.text.toString().isEmpty())
+            status = false
+        if (tvCustomerCategoryValue.text.toString().isEmpty())
+            status = false
+        if(tvURI.text.toString().isEmpty())
+            status = false
+
+        return status
 
     }
 
@@ -342,7 +382,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     }
 
     @Throws(IOException::class)
-    fun saveBitmapToDisk(bitmap: Bitmap) {
+    fun saveBitmapToDisk(bitmap: Bitmap): String {
         val file = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/Screenshots"
         )
@@ -352,8 +392,6 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         val mediaFile = File(
             file, "FieldVisualizer$formattedDate.jpeg"
         )
-        uriHeader.text = getString(R.string.image_uri)
-        tvURI.text = mediaFile.absolutePath
         if (file.mkdirs()) {
             val fileOutputStream = FileOutputStream(mediaFile)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
@@ -361,7 +399,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
             fileOutputStream.close()
         }
 
-        saveData()
+        return mediaFile.absolutePath
     }
 
     fun bitmapToBase64(bitmap: Bitmap): String {
@@ -377,6 +415,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         customerCategorySpace = ""
 
         tvSOSValue.text = ""
+        tvURI.text = ""
         tvFullCategoryValue.text = ""
         tvCustomerCategoryValue.text = ""
         ivPreview1.setImageResource(0)

@@ -4,7 +4,9 @@ import com.adam.shareofshelf.ui.data.BranchDataModel
 import com.adam.shareofshelf.ui.data.CustomerDataModel
 import com.adam.shareofshelf.ui.data.ImageData
 import com.adam.shareofshelf.ui.data.SubmitDataRequest
+import okhttp3.ResponseBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 interface DaeemServiceInterface {
@@ -28,7 +30,7 @@ interface DaeemServiceInterface {
         @Field("branch_id") branchID : String
     ): Call<ArrayList<BranchDataModel>>
 
-
+    @Headers("Content-Type: application/json")
     @POST("app/sos.php")
     fun saveSOS(
         @Body dataModel: SubmitDataRequest
