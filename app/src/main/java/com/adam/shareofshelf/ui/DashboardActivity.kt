@@ -104,10 +104,13 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     private fun bindViews() {
 
         //set the title
-        supportActionBar?.let {
-            it.setTitle(R.string.app_name)
-            it.setDisplayShowHomeEnabled(false)
-            it.setDisplayUseLogoEnabled(false)
+        supportActionBar?.let { actionBar->
+            customerDataModel?.let {
+                actionBar.setTitle(it.branchName)
+            }
+
+            actionBar.setDisplayShowHomeEnabled(false)
+            actionBar.setDisplayUseLogoEnabled(false)
         }
 
         btnSave = findViewById(R.id.btnSave)
