@@ -35,14 +35,13 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.*
 import android.util.Base64
-import androidx.core.view.isVisible
-import com.adam.shareofshelf.ui.adapter.OnItemClickListener
 import com.adam.shareofshelf.ui.data.ImageData
 import com.adam.shareofshelf.ui.data.SubmitDataRequest
-import okhttp3.ResponseBody
+import kotlinx.android.synthetic.main.activity_image_preview.*
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 const val TAG = "Device Support"
@@ -56,6 +55,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     AdapterView.OnItemSelectedListener {
 
     //Variables
+    private var brandImagePath = ""
+    private var finalImagePath = ""
     private var base64Image1 = ""
     private var finalImageBase64 = ""
     private var is2PointsSelected = false
@@ -180,9 +181,9 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         progress.visibility = View.VISIBLE
         customerDataModel?.let {
             val dataRequest = SubmitDataRequest(
-                fullImage = finalImageBase64,
-                brandImage = base64Image1,
-                totalSos = tvSOSValue.text.toString(),
+                fullImage = finalImagePath,
+                brandImage = brandImagePath,
+                totalSos = tvSOSValue.text.toString().trim(),
                 brandSos = tvCustomerCategoryValue.text.toString().split(" ")[0],
                 brandId = branchDataModel?.brandId ?: "",
                 customerId = it.customerId ?: "",
@@ -243,22 +244,52 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
     private fun setAdapter() {
 
-        val mList: ArrayList<Any?> = arrayListOf()
+        val mList: ArrayList<String> = arrayListOf()
         branchList.forEach {
-            mList.add(it.productName ?: "")
+            if(!isBrandIdExist(it,mList))
+            mList.add("${it.brandName ?: ""} ${it.brandId ?: ""}")
         }
 
         branchDataModel = branchList[0]
+
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
-            mList
+            removeIdFromList(mList)
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
 
         // Set the item click listener on the spinner
         spinner.onItemSelectedListener = this
+    }
+
+    private fun removeIdFromList(list: ArrayList<String>): ArrayList<String> {
+        val mList : ArrayList<String> = arrayListOf()
+        list.forEach{
+            val regex = Regex("\\s+\\b")
+            val parts = it.split(regex)
+
+            val lastWord = parts.last()
+            val restOfTheString = it.substring(0, it.length - lastWord.length)
+            mList.add(restOfTheString)
+        }
+
+        return mList
+    }
+
+    private fun isBrandIdExist(data: BranchDataModel, mList: ArrayList<String>): Boolean {
+        var isExist = false
+        mList.forEach{
+            val regex = Regex("\\s+\\b")
+            val parts = it.split(regex)
+
+            val lastWord = parts.last()
+            val restOfTheString = it.substring(0, it.length - lastWord.length)
+            if (lastWord.equals(data.brandId))
+             isExist = true
+        }
+         return isExist
     }
 
 
@@ -309,16 +340,12 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
             R.id.btnSave -> {
 
+                finalImagePath = saveBitmapToDisk(layoutParent.takeScreenShot())
+                uriHeader.text = getString(R.string.image_uri)
+                tvURI.text = finalImagePath
+
                 if(validate())
-                {
-                    mBitmapOBj2?.let {
-                        base64Image1 = saveBitmapToDisk(it)
-                    }
-                    finalImageBase64 = saveBitmapToDisk(layoutParent.takeScreenShot())
-                    uriHeader.text = getString(R.string.image_uri)
-                    tvURI.text = finalImageBase64
                     saveData()
-                }
                 else
                 {
                     val builder = AlertDialog.Builder(this).setCancelable(true).setTitle("Alert!")
@@ -336,11 +363,11 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     private fun validate(): Boolean {
         var status = true
 
-        if (base64Image1.isEmpty())
+        if (brandImagePath.isEmpty())
             status = false
-        if (finalImageBase64.isEmpty())
+        if (finalImagePath.isEmpty())
             status = false
-        if (tvSOSValue.text.toString().isEmpty())
+        if (sosValue == 0.0)
             status = false
         if (tvCustomerCategoryValue.text.toString().isEmpty())
             status = false
@@ -383,6 +410,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
     @Throws(IOException::class)
     fun saveBitmapToDisk(bitmap: Bitmap): String {
+        //finalImageBase64 = bitmapToBase64(bitmap)
         val file = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/Screenshots"
         )
@@ -425,6 +453,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
         ivPreview1.visibility = View.GONE
         ivPreview2.visibility = View.GONE
+        uriHeader.visibility = View.GONE
 
     }
 
@@ -515,6 +544,10 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         } else {
             ivPreview2.visibility = View.VISIBLE
             ivPreview2.setImageBitmap(mBitmapOBj2)
+            mBitmapOBj2?.let {
+                brandImagePath = saveBitmapToDisk(it)
+                //base64Image1 =  bitmapToBase64(it)
+            }
         }
     }
 
