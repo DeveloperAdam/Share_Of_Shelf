@@ -184,8 +184,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         progress.visibility = View.VISIBLE
         customerDataModel?.let {
             val dataRequest = SubmitDataRequest(
-                fullImage = finalImagePath,
-                brandImage = brandImagePath,
+                fullImage = finalImageBase64,
+                brandImage = base64Image1,
                 totalSos = tvSOSValue.text.toString().trim(),
                 brandSos = tvCustomerCategoryValue.text.toString().split(" ")[0],
                 brandId = branchDataModel?.brandId ?: "",
@@ -343,9 +343,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
             R.id.btnSave -> {
 
+                finalImageBase64 = bitmapToBase64(layoutParent.takeScreenShot())
                 finalImagePath = saveBitmapToDisk(layoutParent.takeScreenShot())
-                uriHeader.text = getString(R.string.image_uri)
-                tvURI.text = finalImagePath
 
                 if(validate())
                     saveData()
@@ -373,8 +372,6 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         if (sosValue == 0.0)
             status = false
         if (tvCustomerCategoryValue.text.toString().isEmpty())
-            status = false
-        if(tvURI.text.toString().isEmpty())
             status = false
 
         return status
@@ -413,7 +410,6 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
     @Throws(IOException::class)
     fun saveBitmapToDisk(bitmap: Bitmap): String {
-        //finalImageBase64 = bitmapToBase64(bitmap)
         val file = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/Screenshots"
         )
@@ -446,7 +442,6 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         customerCategorySpace = ""
 
         tvSOSValue.text = ""
-        tvURI.text = ""
         tvFullCategoryValue.text = ""
         tvCustomerCategoryValue.text = ""
         ivPreview1.setImageResource(0)
@@ -456,7 +451,6 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
         ivPreview1.visibility = View.GONE
         ivPreview2.visibility = View.GONE
-        uriHeader.visibility = View.GONE
 
     }
 
@@ -548,8 +542,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
             ivPreview2.visibility = View.VISIBLE
             ivPreview2.setImageBitmap(mBitmapOBj2)
             mBitmapOBj2?.let {
-                brandImagePath = saveBitmapToDisk(it)
-                //base64Image1 =  bitmapToBase64(it)
+               // brandImagePath = saveBitmapToDisk(it)
+                base64Image1 =  bitmapToBase64(it)
             }
         }
     }

@@ -45,4 +45,6 @@
     <string name="image_uri">Image URI</string>
     <string name="success_msg">Your Data has been submitted successfully.</string>
     <string name="ok">OK</string>
+    <string name="total_sos">Total SOS</string>
+    <string name="customer_sos">Customer SOS</string>
 </resources>

@@ -18,7 +18,7 @@
             android:id="@+id/layoutViews"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="invisible">
+            android:visibility="visible">
 
 
             <FrameLayout
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:text="@string/full_category_space"
+                android:text="@string/total_sos"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -106,7 +106,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:text="@string/customer_category"
+                android:text="@string/customer_sos"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -192,30 +192,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvSOS" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/uriHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="@string/image_uri"
-                android:layout_marginTop="10dp"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvSOSValue"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvURI"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="20dp"
-                tools:text="some text"
-                android:textColor="@android:color/black"
-                app:layout_constraintTop_toBottomOf="@+id/uriHeader"
-                app:layout_constraintBottom_toTopOf="@+id/layoutButtons"
-                app:layout_constraintStart_toStartOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutButtons"
