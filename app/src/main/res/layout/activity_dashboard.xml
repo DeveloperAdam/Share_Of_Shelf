@@ -106,7 +106,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:text="@string/customer_sos"
+                android:text="@string/brand_sos"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"

@@ -47,4 +47,5 @@
     <string name="ok">OK</string>
     <string name="total_sos">Total SOS</string>
     <string name="customer_sos">Customer SOS</string>
+    <string name="brand_sos">Brand SOS</string>
 </resources>
