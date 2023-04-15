@@ -365,9 +365,9 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     private fun validate(): Boolean {
         var status = true
 
-        if (brandImagePath.isEmpty())
+        if (base64Image1.isEmpty())
             status = false
-        if (finalImagePath.isEmpty())
+        if (finalImageBase64.isEmpty())
             status = false
         if (sosValue == 0.0)
             status = false
