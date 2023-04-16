@@ -1,5 +1,6 @@
 package com.adam.shareofshelf.ui
 
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -29,6 +30,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private var id = ""
     private var strUsername = ""
     private var strPassword = ""
+    private var progressDialog: Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,8 +53,24 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         finish()
     }
 
+    private fun showProgress() {
+        progressDialog = Dialog(this)
+        progressDialog?.apply {
+            setContentView(R.layout.layout_progress)
+            setCancelable(false)
+            show()
+        }
+
+    }
+
+    private fun hideProgress() {
+        progressDialog?.apply {
+            dismiss()
+        }
+    }
+
     private fun authenticateUser() {
-        progress.visibility = View.VISIBLE
+        showProgress()
         val retrofit = RetrofitClient.getInstance()
         val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
         CoroutineScope(Dispatchers.IO).launch {
@@ -63,7 +81,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                             call: Call<String>,
                             response: Response<String>
                         ) {
-                            progress.visibility = View.GONE
+                            hideProgress()
                             if (response.body().equals("not found", true))
                                 Toast.makeText(
                                     this@LoginActivity,
@@ -77,7 +95,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                         }
 
                         override fun onFailure(call: Call<String>, t: Throwable) {
-                            progress.visibility = View.GONE
+                            hideProgress()
                             Toast.makeText(this@LoginActivity, t.toString(), Toast.LENGTH_LONG)
                                 .show()
                         }
@@ -86,7 +104,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                 )
             } catch (Ex: Exception) {
                 withContext(Dispatchers.Main) {
-                    progress.visibility = View.GONE
+                    hideProgress()
                 }
                 Ex.localizedMessage?.let { Log.e("Error", it) }
             }

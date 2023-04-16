@@ -3,6 +3,8 @@ package com.adam.shareofshelf.ui
 import android.Manifest
 import android.app.ActivityManager
 import android.app.AlertDialog
+import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -36,7 +38,6 @@ import retrofit2.Response
 import java.io.*
 import android.util.Base64
 import com.adam.shareofshelf.ui.data.ImageData
-import com.adam.shareofshelf.ui.data.SubmitDataRequest
 import kotlinx.android.synthetic.main.activity_image_preview.*
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -54,11 +55,11 @@ const val INTENT_MAX_DISTANCE = "1101"
 class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchClickListener,
     AdapterView.OnItemSelectedListener {
 
+    private var progressDialog: Dialog? = null
+
     //Variables
-    private var brandImagePath = ""
-    private var finalImagePath = ""
-    private var base64Image1 = ""
-    private var finalImageBase64 = ""
+    private var brandSosImageBase64 = ""
+    private var totalSosImageBase64 = ""
     private var is2PointsSelected = false
     private var permissionsGranted = false
     private var sosValue = 0.0
@@ -76,7 +77,6 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     private lateinit var ivCustomerCategoryCamera: ImageView
 
     //Data
-    private var submitDataResponse: ImageData? = null
     private var branchDataModel: BranchDataModel? = null
     private var customerDataModel: CustomerDataModel? = null
     private var branchList: ArrayList<BranchDataModel> = arrayListOf()
@@ -90,6 +90,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         setContentView(R.layout.activity_dashboard)
 
 
+
         if (!checkIsSupportedDeviceOrFinish()) {
             Toast.makeText(
                 applicationContext, getString(R.string.device_not_supported), Toast.LENGTH_LONG
@@ -101,12 +102,28 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
     }
 
+    private fun showProgress() {
+        progressDialog = Dialog(this)
+        progressDialog?.apply {
+            setContentView(R.layout.layout_progress)
+            setCancelable(false)
+            show()
+        }
+
+    }
+
+    private fun hideProgress() {
+        progressDialog?.apply {
+            dismiss()
+        }
+    }
+
     private fun bindViews() {
 
         //set the title
-        supportActionBar?.let { actionBar->
+        supportActionBar?.let { actionBar ->
             customerDataModel?.let {
-                actionBar.setTitle(it.branchName)
+                actionBar.title = it.branchName
             }
 
             actionBar.setDisplayShowHomeEnabled(false)
@@ -133,6 +150,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     }
 
     private fun fetchBranches() {
+        showProgress()
         customerDataModel?.let {
             val retrofit = RetrofitClient.getInstance()
             val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
@@ -147,7 +165,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                                 call: Call<ArrayList<BranchDataModel>>,
                                 response: Response<ArrayList<BranchDataModel>>
                             ) {
-                                progress.visibility = View.GONE
+                                hideProgress()
                                 layoutViews.visibility = View.VISIBLE
                                 response.body()?.let {
                                     branchList = it
@@ -159,7 +177,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                                 call: Call<ArrayList<BranchDataModel>>,
                                 t: Throwable
                             ) {
-                                progress.visibility = View.GONE
+                                hideProgress()
                                 layoutViews.visibility = View.VISIBLE
                                 Toast.makeText(
                                     this@DashboardActivity,
@@ -171,7 +189,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                     )
                 } catch (Ex: Exception) {
                     withContext(Dispatchers.Main) {
-                        progress.visibility = View.GONE
+                        hideProgress()
                         layoutViews.visibility = View.VISIBLE
                     }
                     Ex.localizedMessage?.let { Log.e("Error", it) }
@@ -181,37 +199,39 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     }
 
     private fun saveData() {
-        progress.visibility = View.VISIBLE
+        showProgress()
         customerDataModel?.let {
-            val dataRequest = SubmitDataRequest(
-                fullImage = finalImageBase64,
-                brandImage = base64Image1,
-                totalSos = tvSOSValue.text.toString().trim(),
-                brandSos = tvCustomerCategoryValue.text.toString().split(" ")[0],
-                brandId = branchDataModel?.brandId ?: "",
-                customerId = it.customerId ?: "",
-                branchId = it.branchId ?: ""
-            )
             val retrofit = RetrofitClient.getInstance()
             val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    apiInterface.saveSOS(dataRequest).enqueue(
+                    apiInterface.saveSOS(
+                        brand_image = brandSosImageBase64,
+                        full_image = totalSosImageBase64,
+                        customer_id = it.customerId ?: "",
+                        brand_id = branchDataModel?.brandId ?: "",
+                        branch_id = it.branchId ?: "",
+                        total_sos = tvSOSValue.text.toString().trim(),
+                        brand_sos = tvCustomerCategoryValue.text.toString().split(" ")[0]
+                    ).enqueue(
                         object : Callback<ImageData> {
                             override fun onResponse(
                                 call: Call<ImageData>,
                                 response: Response<ImageData>
                             ) {
-                                progress.visibility = View.GONE
+                                Log.d("response", response.toString())
+                                Log.d("response2", response.body().toString())
+                                hideProgress()
                                 if (response.isSuccessful) {
                                     showSuccessDialog()
                                 }
                             }
+
                             override fun onFailure(
                                 call: Call<ImageData>,
                                 t: Throwable
                             ) {
-                                progress.visibility = View.GONE
+                                hideProgress()
                                 layoutViews.visibility = View.VISIBLE
                                 Toast.makeText(
                                     this@DashboardActivity,
@@ -223,7 +243,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                     )
                 } catch (Ex: Exception) {
                     withContext(Dispatchers.Main) {
-                        progress.visibility = View.GONE
+                        hideProgress()
                         layoutViews.visibility = View.VISIBLE
                     }
                     Ex.localizedMessage?.let { Log.e("Error", it) }
@@ -249,8 +269,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
         val mList: ArrayList<String> = arrayListOf()
         branchList.forEach {
-            if(!isBrandIdExist(it,mList))
-            mList.add("${it.brandName ?: ""} ${it.brandId ?: ""}")
+            if (!isBrandIdExist(it, mList))
+                mList.add("${it.brandName ?: ""} ${it.brandId ?: ""}")
         }
 
         branchDataModel = branchList[0]
@@ -268,8 +288,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     }
 
     private fun removeIdFromList(list: ArrayList<String>): ArrayList<String> {
-        val mList : ArrayList<String> = arrayListOf()
-        list.forEach{
+        val mList: ArrayList<String> = arrayListOf()
+        list.forEach {
             val regex = Regex("\\s+\\b")
             val parts = it.split(regex)
 
@@ -283,16 +303,16 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
     private fun isBrandIdExist(data: BranchDataModel, mList: ArrayList<String>): Boolean {
         var isExist = false
-        mList.forEach{
+        mList.forEach {
             val regex = Regex("\\s+\\b")
             val parts = it.split(regex)
 
             val lastWord = parts.last()
             val restOfTheString = it.substring(0, it.length - lastWord.length)
             if (lastWord.equals(data.brandId))
-             isExist = true
+                isExist = true
         }
-         return isExist
+        return isExist
     }
 
 
@@ -343,13 +363,12 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
             R.id.btnSave -> {
 
-                finalImageBase64 = bitmapToBase64(layoutParent.takeScreenShot())
-                finalImagePath = saveBitmapToDisk(layoutParent.takeScreenShot())
+             //   totalSosImageBase64 = bitmapToBase64(layoutParent.takeScreenShot())
+                saveBitmapToDisk(layoutParent.takeScreenShot())
 
-                if(validate())
+                if (validate())
                     saveData()
-                else
-                {
+                else {
                     val builder = AlertDialog.Builder(this).setCancelable(true).setTitle("Alert!")
                         .setMessage("Kindly select all required fields")
                         .setPositiveButton("OK") { dialog, which ->
@@ -365,9 +384,9 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     private fun validate(): Boolean {
         var status = true
 
-        if (base64Image1.isEmpty())
+        if (brandSosImageBase64.isEmpty())
             status = false
-        if (finalImageBase64.isEmpty())
+        if (totalSosImageBase64.isEmpty())
             status = false
         if (sosValue == 0.0)
             status = false
@@ -538,12 +557,14 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         if (isFullCategorySelected) {
             ivPreview1.visibility = View.VISIBLE
             ivPreview1.setImageBitmap(mBitmapOBj)
+            mBitmapOBj?.let {
+                totalSosImageBase64 = bitmapToBase64(it)
+            }
         } else {
             ivPreview2.visibility = View.VISIBLE
             ivPreview2.setImageBitmap(mBitmapOBj2)
             mBitmapOBj2?.let {
-               // brandImagePath = saveBitmapToDisk(it)
-                base64Image1 =  bitmapToBase64(it)
+                brandSosImageBase64 = bitmapToBase64(it)
             }
         }
     }

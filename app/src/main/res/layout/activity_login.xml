@@ -63,11 +63,11 @@
             android:layout_height="wrap_content"
             android:text="@string/sign_in"
             android:textStyle="bold"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:background="@android:color/transparent"
             android:gravity="center"
             android:layout_centerInParent="true"
-            android:layout_toRightOf="@+id/icon"
+            android:layout_toEndOf="@+id/icon"
             android:textColor="@android:color/white"
             android:textAllCaps="false" />
     </RelativeLayout>
@@ -82,14 +82,4 @@
         android:text="@string/remember_me"
         app:layout_constraintTop_toBottomOf="@+id/layoutButton"/>
 
-
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

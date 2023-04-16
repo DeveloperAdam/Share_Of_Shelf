@@ -1,5 +1,6 @@
 package com.adam.shareofshelf.ui
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -28,8 +29,8 @@ import retrofit2.Response
 
 class HomeFragment : Fragment(), OnItemClickListener {
 
+    private var progressDialog: Dialog? = null
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progress: ProgressBar
     private var customerDataModel: ArrayList<CustomerDataModel> = arrayListOf()
 
     override fun onCreateView(
@@ -40,14 +41,30 @@ class HomeFragment : Fragment(), OnItemClickListener {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        progress = view.findViewById(R.id.progress)
         recyclerView = view.findViewById(R.id.rvBranchList)
 
         fetchCustomerList()
         return view
     }
 
+    private fun showProgress() {
+        progressDialog = Dialog(requireContext())
+        progressDialog?.apply {
+            setContentView(R.layout.layout_progress)
+            setCancelable(false)
+            show()
+        }
+
+    }
+
+    private fun hideProgress() {
+        progressDialog?.apply {
+            dismiss()
+        }
+    }
+
     private fun fetchCustomerList() {
+        showProgress()
         val retrofit = RetrofitClient.getInstance()
         val apiInterface = retrofit.create(DaeemServiceInterface::class.java)
         CoroutineScope(Dispatchers.IO).launch {
@@ -58,7 +75,7 @@ class HomeFragment : Fragment(), OnItemClickListener {
                             call: Call<ArrayList<CustomerDataModel>>,
                             response: Response<ArrayList<CustomerDataModel>>
                         ) {
-                            progress.visibility = View.GONE
+                           hideProgress()
                             response.body()?.let {
                                 customerDataModel = it
                                 setAdapter()
@@ -69,7 +86,7 @@ class HomeFragment : Fragment(), OnItemClickListener {
                             call: Call<ArrayList<CustomerDataModel>>,
                             t: Throwable
                         ) {
-                            progress.visibility = View.GONE
+                            hideProgress()
                             Toast.makeText(requireContext(), t.toString(), Toast.LENGTH_LONG).show()
                         }
 
@@ -77,7 +94,7 @@ class HomeFragment : Fragment(), OnItemClickListener {
                 )
             } catch (Ex: Exception) {
                 withContext(Dispatchers.Main) {
-                    progress.visibility = View.GONE
+                  hideProgress()
                 }
                 Ex.localizedMessage?.let { Log.e("Error", it) }
             }
