@@ -37,7 +37,8 @@ interface DaeemServiceInterface {
         @Field("brand_id") brand_id: String,
         @Field("branch_id") branch_id: String,
         @Field("total_sos") total_sos: String,
-        @Field("brand_sos") brand_sos: String
+        @Field("brand_sos") brand_sos: String,
+        @Field("result") result: String
     ): Call<ImageData>
 
 }

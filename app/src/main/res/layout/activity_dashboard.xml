@@ -14,7 +14,7 @@
         android:id="@+id/layoutViews"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible">
+        android:visibility="visible">
 
 
         <FrameLayout
@@ -83,7 +83,7 @@
             app:layout_constraintTop_toBottomOf="@+id/layoutCamera1">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvFullCategoryValue"
+                android:id="@+id/tvTotalValue"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:background="@drawable/edittext_border"
@@ -148,7 +148,7 @@
             app:layout_constraintTop_toBottomOf="@+id/layoutCamera2">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvCustomerCategoryValue"
+                android:id="@+id/tvBrandValue"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:background="@drawable/edittext_border"
@@ -177,7 +177,7 @@
 
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvSOSValue"
+            android:id="@+id/tvResultValue"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="15dp"
@@ -197,7 +197,7 @@
             android:layout_marginTop="15dp"
             android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvSOSValue">
+            app:layout_constraintTop_toBottomOf="@+id/tvResultValue">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnClear"

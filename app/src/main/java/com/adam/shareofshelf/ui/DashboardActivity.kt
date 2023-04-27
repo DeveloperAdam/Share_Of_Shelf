@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.ActivityManager
 import android.app.AlertDialog
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -71,8 +70,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     //Views
     private lateinit var btnClear: Button
     private lateinit var btnSave: Button
-    private lateinit var tvFullCategoryValue: TextView
-    private lateinit var tvCustomerCategoryValue: TextView
+    private lateinit var tvTotalSos: TextView
+    private lateinit var tvBrandSos: TextView
     private lateinit var ivFullCategoryCamera: ImageView
     private lateinit var ivCustomerCategoryCamera: ImageView
 
@@ -137,8 +136,8 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
 
         btnSave = findViewById(R.id.btnSave)
         btnClear = findViewById(R.id.btnClear)
-        tvFullCategoryValue = findViewById(R.id.tvFullCategoryValue)
-        tvCustomerCategoryValue = findViewById(R.id.tvCustomerCategoryValue)
+        tvTotalSos = findViewById(R.id.tvTotalValue)
+        tvBrandSos = findViewById(R.id.tvBrandValue)
         ivFullCategoryCamera = findViewById(R.id.ivCameraFullCategory)
         ivCustomerCategoryCamera = findViewById(R.id.ivCameraCustomerCategory)
 
@@ -216,8 +215,9 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                         customer_id = it.customerId ?: "",
                         brand_id = branchDataModel?.brandId ?: "",
                         branch_id = it.branchId ?: "",
-                        total_sos = tvSOSValue.text.toString().trim(),
-                        brand_sos = tvCustomerCategoryValue.text.toString().split(" ")[0]
+                        total_sos = tvTotalSos.text.toString().split(" ")[0],
+                        brand_sos = tvBrandSos.text.toString().split(" ")[0],
+                        result = tvResultValue.text.toString()
                     ).enqueue(
                         object : Callback<ImageData> {
                             override fun onResponse(
@@ -347,6 +347,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                     putExtra(INTENT_TYPE_SELECTION, true)
                 })
             }
+
             R.id.ivPreview2 -> {
                 startActivity(Intent(
                     this@DashboardActivity, ImagePreviewActivity::class.java
@@ -354,21 +355,24 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
                     putExtra(INTENT_TYPE_SELECTION, false)
                 })
             }
+
             R.id.ivCameraFullCategory -> {
                 isFullCategorySelected = true
                 if (permissionsGranted) showDialog()
                 else checkExternalStoragePermission()
             }
+
             R.id.ivCameraCustomerCategory -> {
                 isFullCategorySelected = false
                 if (permissionsGranted) showDialog()
                 else checkExternalStoragePermission()
             }
+
             R.id.btnClear -> clearValues()
 
             R.id.btnSave -> {
 
-             //   totalSosImageBase64 = bitmapToBase64(layoutParent.takeScreenShot())
+                //   totalSosImageBase64 = bitmapToBase64(layoutParent.takeScreenShot())
                 saveBitmapToDisk(layoutParent.takeScreenShot())
 
                 if (validate())
@@ -395,7 +399,7 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
             status = false
         if (sosValue == 0.0)
             status = false
-        if (tvCustomerCategoryValue.text.toString().isEmpty())
+        if (tvBrandSos.text.toString().isEmpty())
             status = false
 
         return status
@@ -465,9 +469,9 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
         fullCategorySpace = ""
         customerCategorySpace = ""
 
-        tvSOSValue.text = ""
-        tvFullCategoryValue.text = ""
-        tvCustomerCategoryValue.text = ""
+        tvResultValue.text = ""
+        tvTotalSos.text = ""
+        tvBrandSos.text = ""
         ivPreview1.setImageResource(0)
         ivPreview2.setImageResource(0)
         mBitmapOBj?.recycle()
@@ -550,13 +554,13 @@ class DashboardActivity : AppCompatActivity(), View.OnClickListener, OnBranchCli
     }
 
     private fun setValues() {
-        tvFullCategoryValue.text = fullCategorySpace.plus(" ${getString(R.string.unit)}")
-        tvCustomerCategoryValue.text = customerCategorySpace.plus(" ${getString(R.string.unit)}")
+        tvTotalSos.text = fullCategorySpace.plus(" ${getString(R.string.unit)}")
+        tvBrandSos.text = customerCategorySpace.plus(" ${getString(R.string.unit)}")
 
         if (fullCategorySpace.isNotEmpty() && customerCategorySpace.isNotEmpty()) {
             sosValue = customerCategorySpace.toDouble() / fullCategorySpace.toDouble() * 100
             val value = DecimalFormat("##.##").format(sosValue)
-            tvSOSValue.text = value
+            tvResultValue.text = value
         }
 
         if (isFullCategorySelected) {
